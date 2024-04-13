@@ -63,7 +63,7 @@ def upload_files(input_bucket, test_dir):
 	
 
 clear_input_bucket(input_bucket)
-# clear_input_bucket(output_bucket)
+clear_input_bucket(output_bucket)
 
 upload_files(input_bucket,test_cases)
 
