@@ -41,6 +41,10 @@ COPY requirements.txt ${FUNCTION_DIR}
 # Install requirments
 RUN python${RUNTIME_VERSION} -m pip install -r requirements.txt --target ${FUNCTION_DIR}
 
+# Install additional project dependencies
+RUN python${RUNTIME_VERSION} -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --target ${FUNCTION_DIR}
+RUN python${RUNTIME_VERSION} -m pip install facenet-pytorch --no-deps --target ${FUNCTION_DIR}
+
 # Copy entry script
 COPY entry.sh /
 
