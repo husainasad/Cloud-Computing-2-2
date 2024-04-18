@@ -51,8 +51,8 @@ COPY entry.sh /
 # Copy project data file
 COPY data.pt ${FUNCTION_DIR}
 
-# Copy configuration
-COPY lambda_config.json ${FUNCTION_DIR}
+# Copy function configuration
+COPY face-recognition_config.json ${FUNCTION_DIR}
 
 # Copy function code
 COPY face-recognition.py ${FUNCTION_DIR}

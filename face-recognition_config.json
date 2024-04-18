@@ -1,0 +1,7 @@
+{
+    "AWS_REGION": "us-east-1",
+    "STAGE1_BUCKET": "1225380117-stage-1",
+    "OUTPUT_BUCKET": "1225380117-output",
+    "Memory": 2048,
+    "Ephemeral Storage": 2048
+  }

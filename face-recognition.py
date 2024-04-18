@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
-config_path = 'lambda_config.json'
+config_path = 'face-recognition_config.json'
 data_path = 'data.pt'
 os.environ['TORCH_HOME'] = '/tmp/'
 
@@ -20,7 +20,7 @@ with open(config_path, 'r') as f:
 saved_data = torch.load(data_path)
 
 region = config.get("AWS_REGION")
-input_bucket = config.get("STAGE1_BUCKET")
+# input_bucket = config.get("STAGE1_BUCKET")
 output_bucket = config.get("OUTPUT_BUCKET")
 
 session = boto3.Session(region_name=region)
@@ -29,7 +29,7 @@ s3_client = session.client('s3')
 mtcnn = MTCNN(image_size=240, margin=0, min_face_size=20)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
-def read_image(img_key):
+def read_image(input_bucket, img_key):
 	try:
 		img_dir = os.path.join('/tmp', img_key)
 		s3_client.download_file(input_bucket, img_key, img_dir)
@@ -37,7 +37,6 @@ def read_image(img_key):
 	except Exception as e:
 		logger.error("Unable to download and read image: %s", e)
 		return None
-
 
 def recognize_image(face):
 	try:
@@ -63,9 +62,9 @@ def upload_to_output(result, filename, bucket_name=output_bucket):
 	except Exception as e:
 		logger.error("Unable to upload image: %s", e)
 
-def process_image(img_key):
+def process_image(input_bucket, img_key):
 	try:
-		img, img_dir = read_image(img_key)
+		img, img_dir = read_image(input_bucket, img_key)
 		if img is None:
 			return
 		# boxes, _ = mtcnn.detect(img)
@@ -86,20 +85,29 @@ def process_image(img_key):
 		if os.path.exists(img_dir):
 			os.remove(img_dir)
 
-def process_request():
-	try:
-		response = s3_client.list_objects_v2(Bucket=input_bucket)
-		for obj in response.get('Contents', []):
-			# print(obj['Key'])
-			process_image(obj['Key'])
-	except Exception as e:
-		logger.error("Unable to get bucket images: %s", e)
+# def process_request():
+# 	try:
+# 		response = s3_client.list_objects_v2(Bucket=input_bucket)
+# 		for obj in response.get('Contents', []):
+# 			# print(obj['Key'])
+# 			process_image(obj['Key'])
+# 	except Exception as e:
+# 		logger.error("Unable to get bucket images: %s", e)
 
 def handler(event, context):
 	try:
+		# event-less invocation
 		# process_request()
-		image_key = event['Records'][0]['s3']['object']['key']
-		process_image(image_key) 
+
+		# s3 event triggered invocation
+		# image_key = event['Records'][0]['s3']['object']['key']
+		# process_image(image_key) 
+  
+		# lambda-to-lambda invocation
+		input_bucket = event['bucket_name']
+		image_key = event['image_file_name']
+		process_image(input_bucket, image_key)
+
 		return {
 			'statusCode': 200,
 			'body': 'Lambda function executed successfully'
