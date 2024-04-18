@@ -2,11 +2,5 @@
   "AWS_REGION": "us-east-1",
   "INPUT_BUCKET": "1225380117-input",
   "STAGE1_BUCKET": "1225380117-stage-1",
-  "OUTPUT_BUCKET": "1225380117-output",
-  "URL_TIMEOUT": 600,
-  "FFMPEG_PATH": "/opt/bin/ffmpeg",
-  "TOTAL_FRAMES": 10,
-  "TEMP_DIR": "/tmp",
-  "Memory": 128,
-  "Ephemeral Storage": 512
+  "OUTPUT_BUCKET": "1225380117-output"
 }

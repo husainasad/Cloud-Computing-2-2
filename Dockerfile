@@ -49,10 +49,10 @@ RUN python${RUNTIME_VERSION} -m pip install facenet-pytorch --no-deps --target $
 COPY entry.sh /
 
 # Copy project data file
-COPY data.pt /
+COPY data.pt ${FUNCTION_DIR}
 
 # Copy configuration
-COPY lambda_config.json /
+COPY lambda_config.json ${FUNCTION_DIR}
 
 # Copy function code
 COPY face-recognition.py ${FUNCTION_DIR}

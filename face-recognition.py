@@ -10,10 +10,14 @@ import logging
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
-with open('/lambda_config.json', 'r') as f:
+config_path = 'lambda_config.json'
+data_path = 'data.pt'
+os.environ['TORCH_HOME'] = '/tmp/'
+
+with open(config_path, 'r') as f:
     config = json.load(f)
 
-saved_data = torch.load('/data.pt')
+saved_data = torch.load(data_path)
 
 region = config.get("AWS_REGION")
 input_bucket = config.get("STAGE1_BUCKET")
