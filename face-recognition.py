@@ -23,10 +23,8 @@ region = config.get("AWS_REGION")
 input_bucket = config.get("STAGE1_BUCKET")
 output_bucket = config.get("OUTPUT_BUCKET")
 
-# session = boto3.Session(region_name=region)
-# s3_client = session.client('s3')
-
-s3_client = boto3.client('s3', region_name=region)
+session = boto3.Session(region_name=region)
+s3_client = session.client('s3')
 
 mtcnn = MTCNN(image_size=240, margin=0, min_face_size=20)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
@@ -98,8 +96,17 @@ def process_request():
 		logger.error("Unable to get bucket images: %s", e)
 
 def handler(event, context):
-	process_request()
-	return {
-		'statusCode': 200,
-		'body': 'Lambda function executed'
-	}
+	try:
+		# process_request()
+		image_key = event['Records'][0]['s3']['object']['key']
+		process_image(image_key) 
+		return {
+			'statusCode': 200,
+			'body': 'Lambda function executed successfully'
+		}
+	except Exception as e:
+		logger.error(e)
+		return {
+			'statusCode': 500,
+			'body': 'Lambda function unable to execute'
+		}	
