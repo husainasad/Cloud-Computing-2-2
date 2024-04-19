@@ -99,7 +99,7 @@ Once the image is successfully psuhed to ECr repository, you can create the lamb
 
 <b> Note: You cannot view or modify the lamda function creating using the 'Container Image' method. <br> </b>
 
-## Step 4: Testing with Workload Generator
+## Step 4: Test with Workload Generator
 Workload Generator simulates a client side and uploads files to the input bucket. <br>
 
 Command to upload videos:
@@ -126,9 +126,11 @@ Both ways have been implemented and tested on the project. <br>
 
 ### Event-Driven Architecture:
 In this approach, each lambda function is triggered by putting objects in S3. <br>
-Therefore, you will have to add respective triggers in the lambda functions. This approach ensures low coupling between the lambda functions. <br>
+Therefore, you will have to add respective triggers in the lambda functions. <br>
+This approach ensures low coupling between the lambda functions. <br>
 
 ### Lambda-to-Lambda Invocation:
 In this approach, the face-recognition function is triggered by video-splitting function. <br>
 Therefore, you will only need to add trigger for the first function. The video-splitting function will invoke the face-recognition function with specific parameters once its own process is complete. The face-recognition function will respond to the invocation and use the specified parameters for processing. <br>
 Additionally, you will have to add the required invoking permission to the lambda-role for invocation. <br>
+This approach tightly couples the lambda functions which is not preferred. <br>
