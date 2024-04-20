@@ -4,6 +4,9 @@ The application consists of : <br>
 * Lambda: To process user videos to generate images and to process images to recognize faces.
 * ECR and Docker: To containerize lambda function images and deploy the functions on AWS.
 
+The architecture of the application is as follows:<br>
+![CC-Project2-Part2-Architecture](https://github.com/husainasad/Cloud-Computing-2-2/assets/32503674/d839be4a-58f4-419e-a978-ff7dbbba5b0c)
+
 ## Step 1: Create S3 Buckets
 The input, stage-1, and output S3 buckets can be created by running the 'createS3.py' script. <br>
 
