@@ -36,29 +36,26 @@ ADD https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/latest
 RUN chmod 755 /usr/bin/aws-lambda-rie
 
 # Copy requirments list
-COPY requirements.txt ${FUNCTION_DIR}
+COPY vs_requirements.txt ${FUNCTION_DIR}
 
 # Install requirments
-RUN python${RUNTIME_VERSION} -m pip install -r requirements.txt --target ${FUNCTION_DIR}
+RUN python${RUNTIME_VERSION} -m pip install -r vs_requirements.txt --target ${FUNCTION_DIR}
 
-# Install additional project dependencies
-RUN python${RUNTIME_VERSION} -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --target ${FUNCTION_DIR}
-RUN python${RUNTIME_VERSION} -m pip install facenet-pytorch --no-deps --target ${FUNCTION_DIR}
+# Install ffmpeg
+RUN apt-get update
+RUN apt-get install -y ffmpeg
 
 # Copy entry script
 COPY entry.sh /
 
-# Copy project data file
-COPY data.pt ${FUNCTION_DIR}
-
 # Copy function configuration
-COPY face-recognition_config.json ${FUNCTION_DIR}
+COPY video-splitting_config.json ${FUNCTION_DIR}
 
 # Copy function code
-COPY face-recognition.py ${FUNCTION_DIR}
+COPY video-splitting.py ${FUNCTION_DIR}
 
 RUN chmod 777 /entry.sh
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 ENTRYPOINT [ "/entry.sh" ]
-CMD [ "face-recognition.handler" ]
+CMD [ "video-splitting.handler" ]

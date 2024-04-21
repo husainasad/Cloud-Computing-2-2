@@ -2,16 +2,20 @@ import os
 import boto3
 import json
 import subprocess
+import logging
 
-with open('video-splitting_config.json') as f:
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
+
+config_path = 'video-splitting_config.json'
+
+with open(config_path) as f:
     config = json.load(f)
 
 region = config.get("AWS_REGION")
 input_bucket = config.get("INPUT_BUCKET")
 output_bucket = config.get("STAGE1_BUCKET")
 timeout = config.get("URL_TIMEOUT")
-ffmpeg_path = config.get("FFMPEG_PATH")
-total_frames = config.get("TOTAL_FRAMES")
 temp_dir = config.get("TEMP_DIR")
 lambda_func = config.get("LAMBDA_TO_INVOKE")
 
@@ -39,7 +43,7 @@ def video_splitting_cmdline(video_url, image_name):
     outdir = os.path.join(temp_dir, image_name)
     os.makedirs(outdir, exist_ok=True)
     
-    split_cmd = f'{ffmpeg_path} -i "{video_url}" -vframes 1 "{outdir}/{image_name}.jpg" -y'
+    split_cmd = f'ffmpeg -i "{video_url}" -vframes 1 "{outdir}/{image_name}.jpg" -y'
     try:
         subprocess.check_call(split_cmd, shell=True)
         return outdir
@@ -86,7 +90,7 @@ def process_objects():
     except Exception as e:
         print("Unable to get bucket objects")
 
-def lambda_handler(event, context):
+def handler(event, context):
     try:
         # process_objects()
         video_key = event['Records'][0]['s3']['object']['key']
