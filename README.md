@@ -11,53 +11,21 @@ The architecture of the application is as follows:<br>
 The input, stage-1, and output S3 buckets can be created by running the 'createS3.py' script. <br>
 
 ## Step 2: Create Lambda function for video splitting
-The video splitting function requires the ffmpeg library. The steps to create ffmpeg layer are loosely based on [this](https://virkud-sarvesh.medium.com/building-ffmpeg-layer-for-a-lambda-function-a206f36d3edc) medium article and [this](https://aws.amazon.com/blogs/media/processing-user-generated-content-using-aws-lambda-and-ffmpeg/) aws guide. <br>
+The video splitting function can be created using two methods: <br>
+* using layers
+* using docker images
 
-### Create FFmpeg zip
-Create the ffmpeg zip using the 'install_ffmpeg.sh' script in AWS Cloudshell or any linux environment. <br>
-Make the script executable using the command:
-```
-chmod +x install_ffmpeg.sh
-```
-Then execute the script using the command:
-```
-./install_ffmpeg.sh
-```
-Once script has finished execution, look for ffmpeg.zip file and download it. <br>
+This project has been updated to use docker images. To use ffmpeg layer, [this](https://virkud-sarvesh.medium.com/building-ffmpeg-layer-for-a-lambda-function-a206f36d3edc) medium article and [this](https://aws.amazon.com/blogs/media/processing-user-generated-content-using-aws-lambda-and-ffmpeg/) aws guide can be followed. <br>
 
-### Create FFmpeg layer
-Create the layer by uploading the zip file from where you downloaded it (S3 or local). <br>
-Add the runtime of your lambda function in compatible runtimes. <br>
-Finally, add the input S3 bucket as trigger for the function. <br>
+The docker image method is as follows: <br>
 
-### Attach FFmpeg layer
-Add the layer in the lambda function whenever you need to use the library. <br>
+### Create Dockerfile
+The 'vs.Dockerfile' present in the project contains the necessary code for the docker image. <br>
+The requirements for the image have been stored in 'vs_requirements.txt' file. <br>
 
 ### Create Lambda function
 The code for lambda function can be found in 'video-splitting.py'. <br>
 The code also makes use of 'video-splitting_config.json' file for reading configurations. <br>
-Make sure the ffmpeg layer is attached. <br>
-
-### Attach S3 trigger
-Attach the S3 event creation trigger so that the function is triggered every time object is put into S3. <br>
-
-## Step 3: Create Lambda function for face recognition
-The face recognition function makes use of pytorch libraries and facenet models. Since there are lot of libraries involved, using docker images is the ideal way. The steps to create and use docker image are loosely based on [this](https://repost.aws/knowledge-center/lambda-container-images) aws guide.
-
-### Create Dockerfile
-The Dockerfile present in the project contains the necessary code for the docker image. <br>
-It is very important to understand where to install dependencies and files required by the function as the incorrectly configured image would still run locally but fail on cloud. <br>
-
-You can check the directory structure of the function environment by using the following command: <br>
-```
-docker exec -t -i {container-name} /bin/bash
-```
-
-Run the above command on a different terminal while the docker container is running. <br>
-
-### Create Lambda function
-The code for lambda function can be found in 'face-recognition.py'. <br>
-The code also makes use of 'face-recognition_config.json' file for reading configurations. <br>
 
 ### Build and Test locally
 Build using the following command: <br>
@@ -86,24 +54,39 @@ curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d
 ### Upload to ECR
 Once you are satisfied with testing the application locally, it is time to deploy the application on AWS environment. For this, we will make use of ECR. <br>
 
-First, create your AWS ECR registry. <br>
+First, create your AWS ECR repository. <br>
 
-<b> Note: You must create private registry as AWS currently only supports creation of Lambda functions from private ECR registries. <br> </b>
+<b> Note: You must create private repository as AWS currently only supports creation of Lambda functions from private ECR registries. <br> </b>
 
-Once ECR registry is created, the commands to push image to ECR are present in the ECR registry under the 'view push commands' section. <br>
+Once ECR repository is created, the commands to push image to ECR are present in the ECR repository under the 'view push commands' section. <br>
 
-<b> Note: For Windows users, there might be an issue with authenticating Docker CLI to AWS ECR registry causing the following error message: <br>
+<b> Note: For Windows users, there might be an issue with authenticating Docker CLI to AWS ECR repository causing the following error message: <br>
 "docker login: error storing credentials `The stub received bad data.`"
 
 To resolve this issue, I followed [this](https://stackoverflow.com/questions/60807697/docker-login-error-storing-credentials-the-stub-received-bad-data) stackoverflow post. The steps are: <br>
 * Remove C:\Program Files\Docker\Docker\resources\bin\docker-credential-wincred.exe
-* Remove "credsStore": "desktop" in C:\Users\XXXX\.docker\config.json file
+* Replace "credsStore": "desktop" in C:\Users\XXXX\.docker\config.json file with "credsStore": "ecr-login"
 </b>
 
 ### Create Lambda function using ECR
 Once the image is successfully psuhed to ECr repository, you can create the lambda function by selecting 'Container image' option and using the Image ECR URI. <br>
 
-<b> Note: You cannot view or modify the lamda function creating using the 'Container Image' method. <br> </b>
+<b> Note: You cannot view or modify the lambda function creating using the 'Container Image' method. <br> </b>
+
+### Attach S3 trigger
+Attach the S3 event creation trigger so that the function is triggered every time object is put into S3. <br>
+
+## Step 3: Create Lambda function for face recognition
+The face recognition function makes use of pytorch libraries and facenet models. Since there are lot of libraries involved, using docker images is the ideal way. The steps to create and use docker image are loosely based on [this](https://repost.aws/knowledge-center/lambda-container-images) aws guide. <br>
+
+The steps to create function using docker image is same as video-splitting function which include: <br>
+* Create Dockerfile: Use 'fr.Dockerfile' and 'fr_requirements.txt'
+* Create Lambda function: Use 'face-recognition.py' and 'face-recognition_config.json'
+* Build and Test locally
+* Upload to ECR
+* Create Lambda function using ECR
+
+Depending upon the architectural choice (explained in last section), S3 trigger can be attached to the function. <br>
 
 ## Step 4: Test with Workload Generator
 Workload Generator simulates a client side and uploads files to the input bucket. <br>
