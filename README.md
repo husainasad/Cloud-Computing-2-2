@@ -69,6 +69,9 @@ Run container from the image using the following command [local testing only]: <
 ```
 docker run -p 9000:8080 -e AWS_ACCESS_KEY_ID={your aws key id} -e AWS_SECRET_ACCESS_KEY={your aws secrey key} {image-name}:{version-name}
 ```
+
+<b> Note: Sometimes the container throws the error message : exec /entry.sh: no such file or directory. To resolve this issue, ensure that the script files have LF line endings. <br> </b>
+
 <b> Note: The lambda function needs credentials to create AWS clients. While credentials are not required in AWS environment, you will have to pass them when you test the application locally. <br> </b>
 
 <b> Note: When testing locally, you will need to create AWS clients directly (without creating session client).You can add the code to create session client once you are done testing. <br> </b>
