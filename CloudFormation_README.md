@@ -8,7 +8,7 @@ There are different ways to create Lambda functions using CloudFormation templat
 * Creating docker image of the function, uploading to ECR and adding image uri to the template
 
 ## Using Function Zip File
-* Write the lambda function (refer to 'hello-lambda.py')
+* Write the lambda function
 * Zip the function and upload the zip file to S3
 * Create the yaml file for lambda function (explained below)
 * Upload the template to CF stack
@@ -27,3 +27,11 @@ Apart from the above properties, you can specify other properties for more contr
 After the template is uploaded to CloudFormation stack, the entire process of creating and configuring the function is automated.<br>
 Once the stack execution is successful, head over to lambda console where the newly created function is available. <br>
 Test the function to make sure the code runs correctly.
+
+## Using DockerFile and ECR
+* Create the lambda function, Dockerfile, requirements, and build the image
+* Push the image to ECR
+* Create the yaml file for lambda function
+* Upload the template to CF stack
+
+<b> Note: The YAML for using Images differs from using Zip files in terms of property attributes. When using image uri, you must remove 'handler' and 'Runtime' properties, and modify 'PackageType' to be 'Image' <br> <b>

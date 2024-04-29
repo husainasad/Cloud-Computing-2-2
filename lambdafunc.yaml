@@ -5,15 +5,13 @@ Resources:
     Properties:
       Role: arn:aws:iam::223420481310:role/service-role/video-splitting-role-6fis1y1e
       Code:
-        S3Bucket: testing-bucket-abc
-        S3Key: hello-lambda.zip
+        ImageUri: 223420481310.dkr.ecr.us-east-1.amazonaws.com/testing-hello:v1 
       Description: 'Testing lambda using cloud formation'
       EphemeralStorage: 
         Size: 2048
       MemorySize: 2048
       Timeout: 600
-      Runtime: python3.11
-      Handler: hello-lambda.handler
       Tags:
       - Key: Name
         Value: TestCFLambda
+      PackageType: Image
