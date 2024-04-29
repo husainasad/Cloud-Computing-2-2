@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  LambdaCFFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: arn:aws:iam::223420481310:role/service-role/video-splitting-role-6fis1y1e
+      Code:
+        ImageUri: 223420481310.dkr.ecr.us-east-1.amazonaws.com/testing-hello:v1 
+      Description: 'Testing lambda using cloud formation'
+      EphemeralStorage: 
+        Size: 2048
+      MemorySize: 2048
+      Timeout: 600
+      Tags:
+      - Key: Name
+        Value: TestCFLambda
+      PackageType: Image
